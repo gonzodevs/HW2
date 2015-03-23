@@ -10,6 +10,13 @@ class MoviesController < ApplicationController
     @movies = Movie.all
     @sort=params[:sort]
     @movies=Movie.order(params[:sort])
+    @all_ratings=['G','PG','PG-13','R']
+
+
+    if(params[:ratings]!=nil)
+      @keys=params[:ratings].keys
+      @movies=Movie.find_all_by_rating(@keys)
+    end
 
 
   end
