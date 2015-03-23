@@ -11,13 +11,30 @@ class MoviesController < ApplicationController
     @sort=params[:sort]
     @movies=Movie.order(params[:sort])
     @all_ratings=['G','PG','PG-13','R']
+    @filter_ratings=[]
+    @filter_ratings_h={}
 
-
-    if(params[:ratings]!=nil)
-      @keys=params[:ratings].keys
-      @movies=Movie.find_all_by_rating(@keys)
+    if(params[:sort])
+      session[:sort]=@sort
+    else if(session[:sort])
+           params[:sort]=session[:sort]
+           @sort=params[:sort]
+         end
     end
 
+    if (params[:ratings])
+      params[:ratings].each_key do |key|
+        @filter_ratings_h[key]=key
+        @filter_ratings.push(key)
+      end
+      @movies = Movie.find(:all, :order=>@sort, :conditions => {:rating => @filter_ratings})
+      session[:ratings] = @filter_ratings_h;
+    else if (session[:ratings])
+           flash.keep
+        redirect_to movies_path(:sort=>session[:sort], :ratings=>session[:ratings])
+      end
+      @movies = Movie.all(:order=>@sort)
+    end
 
   end
 
